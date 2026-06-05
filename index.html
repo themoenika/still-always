@@ -299,7 +299,7 @@
   let activeMode = null, pressTimer = null, lastClick = 0, longPressed = false;
 
   // Floaties
-  const floatieEmojis = ['💛','🌼','✨','💫','🌸','💕','🌟','🍃'];
+  const floatieEmojis = ['💛','🌼','✨','💫','💙','🌸','💕','💚','🌟','🍃'];
   for (let i = 0; i < 12; i++) {
     const f = document.createElement('div');
     f.className = 'floatie';
@@ -369,7 +369,7 @@
   function spawnHeart() {
     const el = document.createElement('div');
     el.style.cssText = `position:fixed;z-index:75;font-size:${1+Math.random()*1.5}rem;pointer-events:none;`;
-    el.textContent = ['💛','🧡','💕','✨','🌟'][Math.floor(Math.random()*5)];
+    el.textContent = ['💙','💚','💕','✨','🌟'][Math.floor(Math.random()*5)];
     el.style.left = (10 + Math.random() * 80) + 'vw';
     el.style.top  = (10 + Math.random() * 80) + 'vh';
     el.style.animation = 'floatUp 2s ease-out forwards';
@@ -432,7 +432,7 @@
   function doLoveRain() {
     if (activeMode === 'rain') return;
     activeMode = 'rain';
-    const emojis = ['💛','🧡','💕','🌸','✨','🐒','🌟','💫','🍀','🌈'];
+    const emojis = ['💚','💙','💕','🌸','✨','🐒','🌟','💫','🍀','🌈'];
     let count = 0;
     const interval = setInterval(() => {
       if (count >= 40) { clearInterval(interval); return; }
@@ -449,7 +449,7 @@
     }, 80);
     const msg = document.createElement('div');
     msg.style.cssText = `position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:95;font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:800;color:#5C3D2E;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);padding:16px 28px;border-radius:20px;border:3px solid #FFD166;text-align:center;max-width:300px;box-shadow:0 8px 32px rgba(255,140,66,0.2);opacity:0;`;
-    msg.innerHTML = '💛 Sending you ALL the love 💛';
+    msg.innerHTML = '💚 Sending you ALL the love 💙';
     document.body.appendChild(msg);
     setTimeout(() => { msg.style.opacity='1'; msg.style.transition='opacity 0.4s'; }, 50);
     setTimeout(() => { msg.style.opacity='0'; }, 3500);
