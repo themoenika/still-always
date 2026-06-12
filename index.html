@@ -55,9 +55,16 @@
   .blink-overlay { position:fixed; inset:0; background:#5C3D2E; z-index:80; opacity:0; pointer-events:none; transition:opacity 0.4s; }
   .blink-overlay.active{opacity:1;pointer-events:all;}
   .blink-overlay .blink-content { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
-  .blink-overlay .blink-content .eye { font-size:5rem; animation:blinkEye 2s ease-in-out infinite; }
+  .blink-overlay .blink-content .moon { font-size:5rem; }
   .blink-overlay .blink-content p { font-family:'Cormorant Garamond',serif; color:var(--warm2); font-size:1.4rem; margin-top:16px; font-weight:700; }
-  @keyframes blinkEye { 0%,45%,55%,100%{transform:scaleY(1);} 50%{transform:scaleY(0.05);} }
+
+  /* Moon phase animation */
+  @keyframes moonPhase {
+    0%    { content: '🌘'; }
+    33%   { content: '🌗'; }
+    66%   { content: '🌖'; }
+    100%  { content: '🌕'; }
+  }
 
   /* LOVE RAIN */
   .love-rain-item { position:fixed; z-index:90; pointer-events:none; animation:rainFall linear forwards; }
@@ -75,7 +82,6 @@
     z-index:3;
   }
 
-  /* SVG arm keyframes */
   @keyframes armLeftWrap {
     0%   { transform:rotate(-155deg); }
     25%  { transform:rotate(-90deg); }
@@ -141,14 +147,14 @@
 <div class="hug-right" id="hugRight">❣️</div>
 <div class="hug-bg" id="hugBg"></div>
 <div class="hug-msg" id="hugMsg">
-  <p>You are held 💛<br><span style="font-size:1.1rem;font-weight:600">Across every distance,<br>you are not alone.</span></p>
+  <p id="hugMsgText">You are held 💛<br><span style="font-size:1.1rem;font-weight:600">Across every distance,<br>you are not alone.</span></p>
 </div>
 
 <!-- BLINK -->
 <div class="blink-overlay" id="blinkOverlay">
   <div class="blink-content">
-    <div class="eye">🌙</div>
-    <p>Asleep, but still here.<br>always. 💛</p>
+    <div class="moon" id="moonEmoji">🌘</div>
+    <p>Rest now. I'm here.<br>Always. 💛</p>
   </div>
 </div>
 
@@ -178,7 +184,7 @@
         </filter>
       </defs>
 
-      <!-- LEFT ARM — starts swept far left, wraps inward -->
+      <!-- LEFT ARM -->
       <g class="arm-left" style="transform-origin:82px 78px; transform:rotate(-155deg);">
         <rect x="26" y="72" width="60" height="25" rx="12" fill="#8B5E3C"/>
         <rect x="-6" y="69" width="42" height="22" rx="11" fill="#7A5030" transform="rotate(-12 15 80)"/>
@@ -186,10 +192,8 @@
         <circle cx="-2" cy="81" r="6"  fill="#6B4226"/>
         <circle cx="4"  cy="76" r="6"  fill="#6B4226"/>
         <circle cx="13" cy="77" r="6"  fill="#6B4226"/>
-        <!-- blanket panels -->
         <rect x="-90" y="68" width="100" height="40" rx="8" fill="url(#bp1)" filter="url(#fuzz)" opacity="0.94"/>
         <rect x="-90" y="102" width="100" height="22" rx="6" fill="url(#bp2)" filter="url(#fuzz)" opacity="0.72"/>
-        <!-- fringe -->
         <line x1="-86" y1="122" x2="-86" y2="136" stroke="#AA96DA" stroke-width="3.5" stroke-linecap="round"/>
         <line x1="-74" y1="122" x2="-74" y2="138" stroke="#FFD166" stroke-width="3.5" stroke-linecap="round"/>
         <line x1="-62" y1="122" x2="-62" y2="135" stroke="#FF8C42" stroke-width="3.5" stroke-linecap="round"/>
@@ -200,7 +204,7 @@
         <line x1="-2"  y1="122" x2="-2"  y2="135" stroke="#FF8C42" stroke-width="3.5" stroke-linecap="round"/>
       </g>
 
-      <!-- RIGHT ARM — starts swept far right, wraps inward -->
+      <!-- RIGHT ARM -->
       <g class="arm-right" style="transform-origin:82px 78px; transform:rotate(155deg);">
         <rect x="78" y="72" width="60" height="25" rx="12" fill="#8B5E3C"/>
         <rect x="128" y="69" width="42" height="22" rx="11" fill="#7A5030" transform="rotate(12 149 80)"/>
@@ -208,10 +212,8 @@
         <circle cx="154" cy="81" r="6"  fill="#6B4226"/>
         <circle cx="160" cy="76" r="6"  fill="#6B4226"/>
         <circle cx="169" cy="77" r="6"  fill="#6B4226"/>
-        <!-- blanket panels -->
         <rect x="154" y="68" width="100" height="40" rx="8" fill="url(#bp1)" filter="url(#fuzz)" opacity="0.94"/>
         <rect x="154" y="102" width="100" height="22" rx="6" fill="url(#bp2)" filter="url(#fuzz)" opacity="0.72"/>
-        <!-- fringe -->
         <line x1="250" y1="122" x2="250" y2="136" stroke="#AA96DA" stroke-width="3.5" stroke-linecap="round"/>
         <line x1="238" y1="122" x2="238" y2="138" stroke="#FFD166" stroke-width="3.5" stroke-linecap="round"/>
         <line x1="226" y1="122" x2="226" y2="135" stroke="#FF8C42" stroke-width="3.5" stroke-linecap="round"/>
@@ -264,7 +266,7 @@
   </div>
 </div>
 
-<div class="dismiss" id="dismiss">tap anywhere to return 🐒</div>
+<div class="dismiss" id="dismiss">tap to return 🐒</div>
 
 <!-- MAIN SCREEN -->
 <div class="stage">
@@ -288,7 +290,9 @@
   const hugRight     = document.getElementById('hugRight');
   const hugBg        = document.getElementById('hugBg');
   const hugMsg       = document.getElementById('hugMsg');
+  const hugMsgText   = document.getElementById('hugMsgText');
   const blinkOverlay = document.getElementById('blinkOverlay');
+  const moonEmoji    = document.getElementById('moonEmoji');
   const blanketStage = document.getElementById('blanket-stage');
   const blanketCanvas= document.getElementById('blanket-canvas');
   const blanketMsg   = document.getElementById('blanket-msg');
@@ -298,8 +302,24 @@
 
   let activeMode = null, pressTimer = null, lastClick = 0, longPressed = false;
 
+  // Rotating hug messages
+  const hugMessages = [
+    `You are held 💛<br><span style="font-size:1.1rem;font-weight:600">Across every distance,<br>you are not alone.</span>`,
+    `I'm proud of you 🏆<br><span style="font-size:1.1rem;font-weight:600">Every single day,<br>you show up. That matters.</span>`,
+    `You're doing amazing 🌕<br><span style="font-size:1.1rem;font-weight:600">Truly, truly amazing.</span>`,
+    `Grief is love with nowhere to go 💛<br><span style="font-size:1.1rem;font-weight:600">And there is so much love here,<br>for you, right now.</span>`,
+    `You don't have to be okay 🌿<br><span style="font-size:1.1rem;font-weight:600">You just have to be.<br>That's enough for today.</span>`,
+    `You are not carrying this alone 🌸<br><span style="font-size:1.1rem;font-weight:600">Even across the distance,<br>I am right here.</span>`,
+    `Nothing about this has to be rushed 🪻<br><span style="font-size:1.1rem;font-weight:600">Take the time you need.</span>`,
+  ];
+  let hugMsgIndex = 0;
+
+  // Moon phases for blink animation
+  const moonPhases = ['🌘', '🌗', '🌖', '🌕'];
+  let moonTimer = null;
+
   // Floaties
-  const floatieEmojis = ['💛','🌼','✨','💫','💙','🌸','💕','💚','🌟','🍃'];
+  const floatieEmojis = ['💚','💙','🪻','🕊️','🌸','✨','💫','🌟','🌙','💛'];
   for (let i = 0; i < 12; i++) {
     const f = document.createElement('div');
     f.className = 'floatie';
@@ -333,12 +353,27 @@
     if (aR) { aR.classList.remove('wrapping'); void aR.offsetWidth; aR.style.transform = 'rotate(155deg)'; }
   }
 
+  function stopMoonAnimation() {
+    if (moonTimer) { clearInterval(moonTimer); moonTimer = null; }
+    moonEmoji.textContent = '🌘';
+  }
+
+  function startMoonAnimation() {
+    let phaseIndex = 0;
+    moonEmoji.textContent = moonPhases[0];
+    moonTimer = setInterval(() => {
+      phaseIndex = (phaseIndex + 1) % moonPhases.length;
+      moonEmoji.textContent = moonPhases[phaseIndex];
+    }, 700);
+  }
+
   function resetAll() {
     hugLeft.classList.remove('active');
     hugRight.classList.remove('active');
     hugBg.classList.remove('active');
     hugMsg.classList.remove('active');
     blinkOverlay.classList.remove('active');
+    stopMoonAnimation();
     aura.classList.remove('active');
     blanketStage.classList.remove('active');
     blanketCanvas.style.opacity = '0';
@@ -357,6 +392,9 @@
   function doHug() {
     if (activeMode) return;
     activeMode = 'hug';
+    // Pick next message in rotation
+    hugMsgText.innerHTML = hugMessages[hugMsgIndex % hugMessages.length];
+    hugMsgIndex++;
     aura.classList.add('active');
     monkey.textContent = '🐵';
     monkey.style.filter = 'drop-shadow(0 0 30px rgba(255,209,102,0.9))';
@@ -382,10 +420,11 @@
     if (activeMode) return;
     activeMode = 'blink';
     blinkOverlay.classList.add('active');
+    startMoonAnimation();
     showDismiss();
   }
 
-  // BLANKET mode — SVG monkey with sweeping arms
+  // BLANKET mode
   function doBlanket() {
     if (activeMode) return;
     activeMode = 'blanket';
@@ -394,18 +433,15 @@
     resetArms();
     blanketStage.classList.add('active');
 
-    // Monkey bounces in
     monkeyWrap.classList.remove('bounce-in','floating');
     void monkeyWrap.offsetWidth;
     monkeyWrap.classList.add('bounce-in');
 
-    // Pixel quilt fades in slowly behind
     setTimeout(() => {
       blanketCanvas.style.transition = 'opacity 2.5s';
       blanketCanvas.style.opacity = '0.8';
     }, 400);
 
-    // Arms begin their slow cuddle sweep after monkey lands
     setTimeout(() => {
       const aL = document.querySelector('.arm-left');
       const aR = document.querySelector('.arm-right');
@@ -415,16 +451,12 @@
       aR.classList.add('wrapping');
     }, 900);
 
-    // Gentle float once arms are fully settled
     setTimeout(() => {
       monkeyWrap.classList.remove('bounce-in');
       monkeyWrap.classList.add('floating');
     }, 5800);
 
-    // Cozy message after the wrap completes
     setTimeout(() => blanketMsg.classList.add('show'), 5000);
-
-    // Dismiss appears late — let her sit in the hug
     setTimeout(() => dismiss.classList.add('show'), 8000);
   }
 
